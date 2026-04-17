@@ -3,7 +3,7 @@ import { FileRoutes } from "@solidjs/start/router";
 import { MetaProvider } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { AuthProvider } from "~/lib/guards/auth";
-import { StoreProvider } from "~/lib/store-context";
+import { StoreProvider } from "~/components/ui/store";
 import "./app.css";
 import Home from "./home"
 // Shared QueryClient instance - required so all components share the same cache.
@@ -15,12 +15,14 @@ export default function App() {
   return (
     <MetaProvider>
       <QueryClientProvider client={queryClient}>
-        <StoreProvider id="st_1abc00000400">
-          <Router
-            root={Home}
-          >
-            <FileRoutes />
-          </Router>
+        <StoreProvider publicId="st_1abc00000400">
+          <AuthProvider>
+            <Router
+              root={Home}
+            >
+              <FileRoutes />
+            </Router>
+          </AuthProvider>
         </StoreProvider>
       </QueryClientProvider>
     </MetaProvider>
