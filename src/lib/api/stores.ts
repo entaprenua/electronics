@@ -1,7 +1,7 @@
 import { api } from './client';
 import type { Store } from '../types';
 
-const STORES_BASE = '/';
+const STORES_BASE = '';
 
 export const storesApi = {
   /**
