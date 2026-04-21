@@ -25,7 +25,10 @@ type ProductActionProps = {
 const ProductActionWrapper = (props: { children?: JSX.Element; class?: string }) => {
   return (
     <div
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation()
+        e.preventDefault()
+      }}
       class={props.class}
     >
       {props.children}
@@ -227,7 +230,6 @@ const ProductAddToCartTrigger = (props: ProductActionProps) => {
   })
 
   const handleClick = (e: MouseEvent) => {
-    e.stopPropagation()
     props.onClick?.(e)
     if (cart && product?.data) {
       const price = typeof product.data.price === "string"
@@ -276,7 +278,6 @@ const ProductRemoveFromCartTrigger = (props: ProductActionProps) => {
   })
 
   const handleClick = (e: MouseEvent) => {
-    e.stopPropagation()
     props.onClick?.(e)
     if (product?.data?.id && cart) {
       cart.removeItem(product.data.id)
@@ -319,7 +320,6 @@ const ProductAddToWishlistTrigger = (props: ProductActionProps) => {
   })
 
   const handleClick = (e: MouseEvent) => {
-    e.stopPropagation()
     props.onClick?.(e)
     if (wishlist && product?.data) {
       wishlist.addItem({
@@ -360,7 +360,6 @@ const ProductRemoveFromWishlistTrigger = (props: ProductActionProps) => {
   })
 
   const handleClick = (e: MouseEvent) => {
-    e.stopPropagation()
     props.onClick?.(e)
     if (product?.data?.id && wishlist) {
       wishlist.removeItem(product.data.id)
@@ -403,7 +402,6 @@ const ProductToggleWishlistTrigger = (props: ProductActionProps) => {
   })
 
   const handleClick = (e: MouseEvent) => {
-    e.stopPropagation()
     props.onClick?.(e)
     if (!product?.data?.id || !wishlist) return
 
@@ -437,7 +435,6 @@ const ProductOrderTrigger = (props: ProductActionProps) => {
   const order = useOrder()
 
   const handleClick = (e: MouseEvent) => {
-    e.stopPropagation()
     props.onClick?.(e)
     if (!product?.data?.id) return
 
@@ -489,7 +486,6 @@ const ProductQuantityDecrementTrigger = (props: ProductActionProps) => {
   })
 
   const handleDecrement = (e: MouseEvent) => {
-    e.stopPropagation()
     props.onClick?.(e)
     if (!item() || !cart || !product?.data?.id) return
     const currentQty = item()?.quantity ?? 1
@@ -530,7 +526,6 @@ const ProductQuantityIncrementTrigger = (props: ProductActionProps) => {
   })
 
   const handleIncrement = (e: MouseEvent) => {
-    e.stopPropagation()
     props.onClick?.(e)
     if (!item() || !cart || !product?.data?.id) return
     const currentQty = item()?.quantity ?? 1

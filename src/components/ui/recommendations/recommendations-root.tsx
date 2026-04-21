@@ -1,6 +1,6 @@
 import { Show, splitProps, type JSX, createMemo } from "solid-js"
 import { RecommendationsProvider, useRecommendations } from "./recommendations-context"
-import { Query, QueryBoundary } from "~/components/ui/query"
+import { Query, useQueryState } from "~/components/ui/query"
 import { Collection, CollectionView, CollectionContent } from "~/components/ui/collection"
 import { Flex } from "~/components/ui/flex"
 import { Skeleton } from "~/components/ui/skeleton"
@@ -15,8 +15,6 @@ export type RecommendationsRootProps = {
   data?: RecommendationResponse
   queryKey?: unknown[]
   enabled?: boolean
-  errorFallback?: JSX.Element
-  loadingFallback?: JSX.Element
   class?: string
   children?: JSX.Element
 }
@@ -47,26 +45,19 @@ const RecommendationsRoot = (props: RecommendationsRootProps) => {
 
   return (
     <Show when={local.data} fallback={
-        <Show when={hasStoreId()} fallback={<RecommendationsSkeleton />}>
-          <Query 
-            queryFn={queryFn} 
-            queryKey={queryKey()}
-            enabled={local.enabled ?? true}
-          >
-            <QueryBoundary 
-              loadingFallback={local.loadingFallback ?? <RecommendationsSkeleton />} 
-              errorFallback={local.errorFallback}
-            >{items => (
-               <RecommendationsRootContent 
-                  data={items as RecommendationResponse | undefined} 
-                  class={local.class}
-                >{local.children}
-               </RecommendationsRootContent>
-              )}
-            </QueryBoundary>
-           </Query>
-        </Show>
-      }>
+      <Show when={hasStoreId()} fallback={<RecommendationsSkeleton />}>
+        <Query
+          queryFn={queryFn}
+          queryKey={queryKey()}
+          enabled={local.enabled ?? true}
+        >
+          <RecommendationsRootContent
+            class={local.class}
+          >{local.children}
+          </RecommendationsRootContent>
+        </Query>
+      </Show>
+    }>
       <Show when={local.data!.products.length > 0} fallback={null}>
         <RecommendationsProvider initialData={local.data!}>
           <div class={local.class} {...others as any}>{local.children}</div>
@@ -77,9 +68,11 @@ const RecommendationsRoot = (props: RecommendationsRootProps) => {
 }
 
 const RecommendationsRootContent = (props: { data?: RecommendationResponse; class?: string; children?: JSX.Element }) => {
+  const queryState = useQueryState()
+  const data = () => queryState?.data as RecommendationResponse
   return (
-    <Show when={props.data?.products && props.data.products.length > 0} fallback={null}>
-      <RecommendationsProvider initialData={props.data}>
+    <Show when={data()?.products && data().products?.length > 0}>
+      <RecommendationsProvider initialData={data()}>
         <div class={props.class}>{props.children}</div>
       </RecommendationsProvider>
     </Show>
@@ -95,7 +88,7 @@ const RecommendationsItems = (props: RecommendationsItemsProps) => {
   const recommendations = useRecommendations()
   const items = createMemo(() => recommendations.products())
   const [local] = splitProps(props, ["class", "children"])
-  
+
   return (
     <Collection data={items()}>
       {local.children}
@@ -110,7 +103,7 @@ export type RecommendationsItemsViewProps = {
 
 const RecommendationsItemsView = (props: RecommendationsItemsViewProps) => {
   const [local] = splitProps(props, ["class", "children"])
-  
+
   return (
     <CollectionView class={local.class}>
       {local.children}

@@ -19,8 +19,6 @@ type CategoryListProps = {
   mode?: string
   queryKey?: unknown[]
   enabled?: boolean
-  errorFallback?: JSX.Element
-  loadingFallback?: JSX.Element
   children?: JSX.Element
 }
 
@@ -33,8 +31,6 @@ const CategoryList = (rawProps: CategoryListProps) => {
     "mode",
     "queryKey",
     "enabled",
-    "errorFallback",
-    "loadingFallback",
     "children",
   ])
 
@@ -66,8 +62,6 @@ const CategoryList = (rawProps: CategoryListProps) => {
       queryFn={queryFn}
       queryKey={queryKeys()}
       enabled={local.enabled ?? true}
-      loadingFallback={local.loadingFallback ?? <DefaultCategoryListLoading />}
-      errorFallback={local.errorFallback}
     >
       <ModeProvider value={local.mode}>
         {local.children}
@@ -95,8 +89,6 @@ type CategorySubcategoriesProps = {
   pageSize?: number
   queryKey?: unknown[]
   enabled?: boolean
-  errorFallback?: JSX.Element
-  loadingFallback?: JSX.Element
   class?: string
   children?: JSX.Element
 }
@@ -107,8 +99,6 @@ const CategorySubcategories = (props: CategorySubcategoriesProps) => {
     "pageSize",
     "queryKey",
     "enabled",
-    "errorFallback",
-    "loadingFallback",
     "class",
     "children",
   ])

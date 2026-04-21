@@ -1,5 +1,5 @@
-import { createContext, useContext, type JSX, type Accessor, createMemo, createSignal, Show, createEffect } from "solid-js"
-import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query"
+import { createContext, createResource, onMount, useContext, type JSX, type Accessor, createMemo, createSignal, Show, createEffect } from "solid-js"
+import { QueryClient, createQuery, createMutation, useQueryClient } from "@tanstack/solid-query"
 import { cartsApi, type Cart, type CartItem } from "~/lib/api/carts"
 import { sessionsApi } from "~/lib/api/sessions"
 import { useStoreId } from "~/lib/store-context"
@@ -78,6 +78,7 @@ type CartProviderProps = {
   children?: JSX.Element
   loadingFallback?: JSX.Element
   errorFallback?: (error: Error) => JSX.Element
+  queryClient?: QueryClient
 }
 
 export const CartProvider = (props: CartProviderProps) => {
@@ -111,23 +112,34 @@ export const CartProvider = (props: CartProviderProps) => {
     return fetchedCart
   }
 
-  const cartQuery = createQuery(() => ({
+  const [cartData] = createResource(getPublicId, fetchCart)
+  /*const cartQuery = createQuery(() => ({
     queryKey: ["cart", getPublicId()],
     queryFn: fetchCart,
     enabled: !!getPublicId(),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,//1000 * 60 * 5,
     retry: 1,
   }))
-
+ */
   createEffect(() => {
-    if (cartQuery.data) {
-      setCart(cartQuery.data)
+    try {
+      console.log("Error: ", cartData.error)
+      console.log("Loading", cartData.loading)
+      if (!cartData.error && !cartData.loading && window)
+        console.log("hell")
+      if (cartData()) {
+        console.log("DAta", cartData())
+        setCart(cartData())
+      }
+    } catch (error) {
+      console.error("Error: ", error)
     }
+
   })
 
   createEffect(() => {
-    if (cartQuery.isError) {
-      setError(cartQuery.error as Error)
+    if (cartData.error) {
+      setError(cartData.error as Error)
     }
   })
 
@@ -155,41 +167,21 @@ export const CartProvider = (props: CartProviderProps) => {
   const isEmpty = createMemo(() => items().length === 0)
 
   const ensureCart = async (): Promise<Cart | null> => {
-    console.log('[CART] ensureCart called')
     let current = currentCart()
     const publicId = getPublicId()
-    console.log('[CART] publicId:', publicId, 'current:', current?.id)
-    
+
     if (!current && publicId) {
       if (!auth.user()) {
-        console.log('[CART] No auth user, ensuring session')
         await ensureGuestSession(publicId)
       }
-      
-      // First try to get existing cart (handle 404)
-      let existingCart = null
+
       try {
-        console.log('[CART] Calling GET /carts')
-        existingCart = await cartsApi.get(publicId)
-        console.log('[CART] GET response:', existingCart)
-      } catch (e) {
-        console.log('[CART] GET Error (expected):', e)
-        // 404 - no cart exists, continue to create
-      }
-      
-      if (existingCart && existingCart.id) {
-        console.log('[CART] Existing cart found:', existingCart.id)
-        current = existingCart
-        setCart(current)
-      } else {
-        console.log('[CART] Creating new cart...')
-        // No cart exists, create new one
         current = await cartsApi.create(publicId)
-        console.log('[CART] Created cart:', current)
-        setCart(current)
+      } catch {
+        current = await cartsApi.get(publicId)
       }
     }
-    
+
     return current
   }
 
@@ -214,29 +206,28 @@ export const CartProvider = (props: CartProviderProps) => {
       })
     },
     onMutate: async (input: AddToCartInput) => {
-      await cartQuery.refetch()
       const existingItem = items().find(item => item.productId === input.productId)
       const quantity = input.quantity ?? 1
 
       const optimisticItems = existingItem
         ? items().map(item =>
-            item.productId === input.productId
-              ? { ...item, quantity: item.quantity + quantity, subtotal: item.price * (item.quantity + quantity) }
-              : item
-          )
+          item.productId === input.productId
+            ? { ...item, quantity: item.quantity + quantity, subtotal: item.price * (item.quantity + quantity) }
+            : item
+        )
         : [
-            ...items(),
-            {
-              id: crypto.randomUUID?.() ?? `temp-${Date.now()}`,
-              productId: input.productId,
-              quantity,
-              price: input.price,
-              name: input.name ?? "",
-              image: input.image,
-              selected: true,
-              subtotal: input.price * quantity,
-            }
-          ]
+          ...items(),
+          {
+            id: crypto.randomUUID?.() ?? `temp-${Date.now()}`,
+            productId: input.productId,
+            quantity,
+            price: input.price,
+            name: input.name ?? "",
+            image: input.image,
+            selected: true,
+            subtotal: input.price * quantity,
+          }
+        ]
 
       setOptimisticCart(createOptimisticCart({ items: optimisticItems as CartItem[] }))
       return { items: items() }
@@ -389,11 +380,11 @@ export const CartProvider = (props: CartProviderProps) => {
       const publicId = getPublicId()
       const cid = cartId()
       if (!publicId || !cid) throw new Error("Missing cart info")
-      
+
       // Get the NEW selected value (after optimistic update already happened)
       const item = items().find(i => i.productId === productId)
       if (!item) throw new Error("Item not found")
-      
+
       await cartsApi.updateItem(publicId, cid, productId, {
         selected: item.selected,
       })
@@ -411,17 +402,17 @@ export const CartProvider = (props: CartProviderProps) => {
     // Immediate optimistic update (like before)
     const current = currentCart()
     if (!current?.items) return
-    
+
     const item = items().find(i => i.productId === productId)
     if (!item) return
-    
+
     setOptimisticCart({
       ...current,
       items: current.items.map(i =>
         i.productId === productId ? { ...i, selected: !item.selected } : i
       ),
     })
-    
+
     // Background server sync
     toggleSelectedMutation.mutate(productId)
   }
@@ -431,7 +422,7 @@ export const CartProvider = (props: CartProviderProps) => {
       const publicId = getPublicId()
       const cid = cartId()
       if (!publicId || !cid) throw new Error("Missing cart info")
-      
+
       for (const item of items()) {
         if (!item.selected) {
           await cartsApi.updateItem(publicId, cid, item.productId, { selected: true })
@@ -463,7 +454,7 @@ export const CartProvider = (props: CartProviderProps) => {
       const publicId = getPublicId()
       const cid = cartId()
       if (!publicId || !cid) throw new Error("Missing cart info")
-      
+
       for (const item of items()) {
         if (item.selected) {
           await cartsApi.updateItem(publicId, cid, item.productId, { selected: false })
@@ -524,7 +515,7 @@ export const CartProvider = (props: CartProviderProps) => {
     subtotal,
     selectedSubtotal,
     isEmpty,
-    isLoading: () => cartQuery.isLoading,
+    isLoading: () => cartData.loading,
     isPending,
     error,
     addItem: addItemMutation.mutate,
@@ -541,10 +532,12 @@ export const CartProvider = (props: CartProviderProps) => {
     findByProductId,
   }
 
+  const [mounted, setMounted] = createSignal(false)
+  onMount(() => setMounted(true))
   return (
     <CartContext.Provider value={value}>
       <Show
-        when={!cartQuery.isLoading}
+        when={!cartData.loading && mounted()}
         fallback={props.loadingFallback ?? <DefaultCartLoading />}
       >
         {props.children}

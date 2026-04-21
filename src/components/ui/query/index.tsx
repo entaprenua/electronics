@@ -18,7 +18,6 @@ import {
   type QueryClient as QueryClientType,
 } from "@tanstack/solid-query"
 import { cn } from "~/lib/utils"
-import { Box } from "../box"
 import { Button } from "../button"
 
 /**
@@ -196,89 +195,35 @@ const Query = <TData = unknown, TError = Error>(props: QueryProps<TData, TError>
   )
 }
 
-type QueryBoundaryProps = {
-  loadingFallback?: JSX.Element
-  errorFallback?: JSX.Element | ((error: Error, retry: () => void) => JSX.Element)
-  children: JSX.Element | ((data: unknown) => JSX.Element)
-}
-
-const QueryBoundary = (props: QueryBoundaryProps) => {
-  const query = useQueryState()
-
-  const doRefetch = () => {
-    if (query) {
-      query.refetch()
-    }
-  }
-
-  const DefaultErrorFallback = () => (
-    <div class="flex flex-col items-center gap-3 p-4 text-center">
-      <p class="text-sm text-destructive">Failed to load data</p>
-      <Button variant="outline" size="sm" onClick={() => query?.refetch()}>
-        Try again
-      </Button>
-    </div>
-  )
-
-  const renderError = () => {
-    const error = query?.error as Error
-    if (typeof props.errorFallback === "function") {
-      return props.errorFallback(error, () => query?.refetch())
-    }
-    return props.errorFallback ?? <DefaultErrorFallback />
-  }
-
-  return (
-    <ErrorBoundary fallback={renderError()}>
-        <Show when={query} fallback={<div class="text-destructive">QueryBoundary must be used within a Query component</div>}>
-          {(q) => (
-            <Switch>
-              <Match when={q().isLoading}>
-                {props.loadingFallback ?? <QueryLoading />}
-              </Match>
-              <Match when={q().isError}>
-                {renderError()}
-              </Match>
-              <Match when={q().isSuccess}>
-                {typeof props.children === "function" 
-                  ? props.children(q().data) 
-                  : props.children}
-              </Match>
-            </Switch>
-          )}
-        </Show>
-    </ErrorBoundary>
-  )
-}
-
 type QueryLoadingProps = JSX.HTMLAttributes<HTMLDivElement>
 
 const QueryLoading = (props: QueryLoadingProps) => {
   const [local, others] = splitProps(props, ["class", "children"])
-  
+  const query = useQueryState()
+
   return (
-    <div class={cn("flex items-center justify-center p-4", local.class)} {...others}>
-      {local.children ?? (
-        <div class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      )}
-    </div>
+    <Show when={query && query.isLoading}>
+      <Show
+        when={local.children}
+        fallback={<div class="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />}
+      >
+        {local.children}
+      </Show>
+    </Show>
   )
 }
 
-type QueryErrorProps = JSX.HTMLAttributes<HTMLDivElement> & {
-  message?: string
-}
+type QueryErrorProps = JSX.HTMLAttributes<HTMLDivElement>
 
 const QueryError = (props: QueryErrorProps) => {
-  const [local, others] = splitProps(props, ["class", "children", "message"])
+  const [local, others] = splitProps(props, ["class", "children"])
   const query = useQueryState()
 
-  if (!query) return null
 
   return (
-    <Show when={query.isError}>
+    <Show when={query && query.isError}>
       <div class={cn("text-destructive", local.class)} {...others}>
-        {local.children ?? local.message ?? (query.error as Error)?.message ?? "An error occurred"}
+        {local.children}
       </div>
     </Show>
   )
@@ -287,12 +232,11 @@ const QueryError = (props: QueryErrorProps) => {
 type QueryErrorMessageProps = JSX.HTMLAttributes<HTMLDivElement>
 
 const QueryErrorMessage = (props: QueryErrorMessageProps) => {
-  const [local, others] = splitProps(props, ["class", "children"])
+  const [local, others] = splitProps(props, ["class"])
   const query = useQueryState()
 
   return (
     <div class={local.class} {...others}>
-      {local.children}
       {query?.error && (query.error as Error)?.message}
     </div>
   )
@@ -301,12 +245,11 @@ const QueryErrorMessage = (props: QueryErrorMessageProps) => {
 type QueryErrorCauseProps = JSX.HTMLAttributes<HTMLDivElement>
 
 const QueryErrorCause = (props: QueryErrorCauseProps) => {
-  const [local, others] = splitProps(props, ["class", "children"])
+  const [local, others] = splitProps(props, ["class"])
   const query = useQueryState()
 
   return (
     <div class={local.class} {...others}>
-      {local.children}
       {query?.error && (query.error as Error & { cause?: string })?.cause}
     </div>
   )
@@ -529,7 +472,6 @@ function createOptimisticMutation<TData, TError, TVariables>(
 
 export {
   Query,
-  QueryBoundary,
   QueryLoading,
   QueryError,
   QueryErrorMessage,

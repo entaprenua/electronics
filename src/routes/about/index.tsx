@@ -3,54 +3,69 @@ import { Flex } from "~/components/ui/flex"
 
 export default function AboutPage() {
   return (
-    <div class="container mx-auto px-4 py-8">
-      <Text variant="h1" class="text-3xl font-bold mb-8">About Us</Text>
-      
-      <div class="max-w-3xl space-y-6">
-        <div class="bg-white rounded-lg border p-6">
-          <Text variant="h2" class="text-xl font-semibold mb-4">Our Story</Text>
-          <Text variant="body1" class="text-muted-foreground">
-            TechStore was founded in 2020 with a simple mission: to provide the latest electronics at the best prices. 
-            What started as a small online shop has grown into one of the most trusted retailers for tech enthusiasts worldwide.
-          </Text>
-        </div>
+    <div class="bg-slate-50 min-h-screen">
+      <div class="container mx-auto px-4 py-12">
+        <Flex class="flex-col items-center mb-12">
+          <Text variant="h1" class="text-3xl font-bold">About ElectroHub</Text>
+          <Text class="text-slate-500 mt-2">Your tech destination since 2020</Text>
+        </Flex>
         
-        <div class="bg-white rounded-lg border p-6">
-          <Text variant="h2" class="text-xl font-semibold mb-4">Our Mission</Text>
-          <Text variant="body1" class="text-muted-foreground">
-            We believe everyone deserves access to cutting-edge technology. That's why we work tirelessly to bring you 
-            the newest gadgets, most competitive prices, and exceptional customer service.
-          </Text>
-        </div>
-        
-        <div class="bg-white rounded-lg border p-6">
-          <Text variant="h2" class="text-xl font-semibold mb-4">Why Choose Us?</Text>
-          <Flex class="flex-col gap-3">
-            <Flex class="items-center gap-3">
-              <span class="text-primary">✓</span>
-              <Text variant="body1">Free shipping on orders over $50</Text>
+        <div class="max-w-3xl mx-auto space-y-8">
+          <div class="bg-white rounded-lg p-8 border border-slate-200">
+            <Text variant="h2" class="text-xl font-bold mb-4">Our Story</Text>
+            <Text variant="body1" class="text-slate-600 leading-relaxed">
+              ElectroHub was born from a simple idea: everyone deserves access to the latest tech. 
+              Founded in 2020, we curate cutting-edge electronics that blend innovation with everyday life. 
+              Each product in our collection is carefully selected to keep you connected and ahead of the curve.
+            </Text>
+          </div>
+          
+          <div class="bg-white rounded-lg p-8 border border-slate-200">
+            <Text variant="h2" class="text-xl font-bold mb-4">Our Philosophy</Text>
+            <Text variant="body1" class="text-slate-600 leading-relaxed">
+              We believe technology should enhance life, not complicate it. 
+              Our approach focuses on sourcing the latest gadgets from trusted brands, ensuring quality 
+              and performance in every purchase.
+            </Text>
+          </div>
+          
+          <div class="bg-white rounded-lg p-8 border border-slate-200">
+            <Text variant="h2" class="text-xl font-bold mb-6">Why Choose Us</Text>
+            <Flex class="flex-col gap-4">
+              <Flex class="items-start gap-3">
+                <div class="w-6 h-6 bg-cyan-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <span class="text-white text-xs">✓</span>
+                </div>
+                <Text variant="body1" class="text-slate-600">Authentic products with full warranty</Text>
+              </Flex>
+              <Flex class="items-start gap-3">
+                <div class="w-6 h-6 bg-cyan-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <span class="text-white text-xs">✓</span>
+                </div>
+                <Text variant="body1" class="text-slate-600">Free shipping on orders over $99</Text>
+              </Flex>
+              <Flex class="items-start gap-3">
+                <div class="w-6 h-6 bg-cyan-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <span class="text-white text-xs">✓</span>
+                </div>
+                <Text variant="body1" class="text-slate-600">Same-day dispatch on orders before 2pm</Text>
+              </Flex>
+              <Flex class="items-start gap-3">
+                <div class="w-6 h-6 bg-cyan-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <span class="text-white text-xs">✓</span>
+                </div>
+                <Text variant="body1" class="text-slate-600">30-day hassle-free returns</Text>
+              </Flex>
             </Flex>
-            <Flex class="items-center gap-3">
-              <span class="text-primary">✓</span>
-              <Text variant="body1">30-day hassle-free returns</Text>
-            </Flex>
-            <Flex class="items-center gap-3">
-              <span class="text-primary">✓</span>
-              <Text variant="body1">Expert customer support</Text>
-            </Flex>
-            <Flex class="items-center gap-3">
-              <span class="text-primary">✓</span>
-              <Text variant="body1">Secure payment processing</Text>
-            </Flex>
-          </Flex>
-        </div>
-        
-        <div class="bg-white rounded-lg border p-6">
-          <Text variant="h2" class="text-xl font-semibold mb-4">Contact Us</Text>
-          <Text variant="body1" class="text-muted-foreground">
-            Have questions? We'd love to hear from you. Reach out to us at support@techstore.com 
-            or call us at +1 (555) 123-4567.
-          </Text>
+          </div>
+          
+          <div class="bg-white rounded-lg p-8 border border-slate-200">
+            <Text variant="h2" class="text-xl font-bold mb-4">Get in Touch</Text>
+            <Text variant="body1" class="text-slate-600 leading-relaxed">
+              We'd love to help you find the perfect tech for your needs. 
+              Reach out to us at hello@electrohub.com or call us at +1 (555) 123-4567.
+            </Text>
+          </div>
         </div>
       </div>
     </div>

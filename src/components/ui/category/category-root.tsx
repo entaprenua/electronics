@@ -4,7 +4,7 @@ import { CategoryProvider, useCategory, type CategoryProps } from "./category-co
 import { useCollectionItem } from "../collection"
 import { useStoreId } from "~/lib/store-context"
 import type { Category } from "~/lib/types"
-import { Query, QueryBoundary, useQueryState } from "./../query"
+import { Query, useQueryState } from "./../query"
 import { categoriesApi } from "~/lib/api/categories"
 
 type CategoryRootProps = {
@@ -56,8 +56,6 @@ const CategoryRoot = (props: CategoryRootProps) => {
             withChildren={local.withChildren}
             withProducts={local.withProducts}
             queryKey={local.queryKey}
-            errorFallback={local.errorFallback}
-            loadingFallback={local.loadingFallback}
             href={local.href}
             class={local.class}
           >
@@ -119,8 +117,6 @@ const CategoryRootWithFetch = (props: Omit<CategoryRootProps, "data">) => {
     "withChildren",
     "withProducts",
     "queryKey",
-    "errorFallback",
-    "loadingFallback",
     "href",
     "class",
     "children",
@@ -159,19 +155,12 @@ const CategoryRootWithFetch = (props: Omit<CategoryRootProps, "data">) => {
           ]
         }
       >
-        <QueryBoundary
-          loadingFallback={
-            local.loadingFallback ?? <DefaultCategoryLoading />
-          }
-          errorFallback={local.errorFallback}
+        <CategoryRootContent
+          href={local.href}
+          class={local.class}
         >
-          <CategoryRootContent
-            href={local.href}
-            class={local.class}
-          >
-            {local.children}
-          </CategoryRootContent>
-        </QueryBoundary>
+          {local.children}
+        </CategoryRootContent>
       </Query>
     </Show>
   )

@@ -1,7 +1,7 @@
-import { Show, splitProps, type JSX, createMemo } from "solid-js"
+import { Show, createEffect, splitProps, type JSX, createMemo } from "solid-js"
 import { HeroProvider, useHero } from "./hero-context"
 import { useHeroItem } from "./hero-sections"
-import { Query, QueryBoundary } from "../query"
+import { Query, useQueryState } from "../query"
 import { Collection, CollectionView } from "../collection"
 import { Button } from "../button"
 import { Flex } from "../flex"
@@ -17,15 +17,13 @@ export type HeroRootProps = {
   data?: Hero
   queryKey?: unknown[]
   enabled?: boolean
-  errorFallback?: JSX.Element
-  loadingFallback?: JSX.Element
   class?: string
   children?: JSX.Element
 }
 
 const HeroRoot = (props: HeroRootProps) => {
   const [local, others] = splitProps(props, [
-    "heroId", "storeId", "data", "queryKey", "enabled", "errorFallback", "loadingFallback", "class", "children"
+    "heroId", "storeId", "data", "queryKey", "enabled", "class", "children"
   ])
 
   const contextStoreId = useStoreId()
@@ -57,17 +55,10 @@ const HeroRoot = (props: HeroRootProps) => {
           queryKey={queryKey()}
           enabled={local.enabled ?? true}
         >
-          <QueryBoundary
-            loadingFallback={local.loadingFallback ?? <HeroSkeleton />}
-            errorFallback={local.errorFallback}
-          >{items => (
-            <HeroRootContent
-              data={items as Hero | undefined}
-              class={local.class}
-            >{local.children}
-            </HeroRootContent>
-          )}
-          </QueryBoundary>
+          <HeroRootContent
+            class={local.class}
+          >{local.children}
+          </HeroRootContent>
         </Query>
       </Show>
     }>
@@ -81,9 +72,11 @@ const HeroRoot = (props: HeroRootProps) => {
 }
 
 const HeroRootContent = (props: { data?: Hero; class?: string; children?: JSX.Element }) => {
+  const queryState = useQueryState()
+  const data = () => queryState.data as Hero || undefined
   return (
-    <Show when={props.data?.items && props.data.items.length > 0} fallback={null}>
-      <HeroProvider initialHero={props.data}>
+    <Show when={data() && data().items?.length > 0}>
+      <HeroProvider initialHero={data()}>
         <div class={props.class}>{props.children}</div>
       </HeroProvider>
     </Show>

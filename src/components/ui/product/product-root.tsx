@@ -1,7 +1,7 @@
 import { Show, splitProps, createEffect, useContext, type JSX, createMemo } from "solid-js"
 import { A, useParams } from "@solidjs/router"
 import { ProductProvider, useProduct, type ProductContextData } from "./product-context"
-import { Query, QueryBoundary, useQueryState } from "../query"
+import { Query, useQueryState } from "../query"
 import { productsApi } from "~/lib/api/products"
 import { useCollectionItem } from "../collection"
 import { SearchItemContext } from "../search"
@@ -14,8 +14,6 @@ type ProductRootProps = {
   includeMedia?: boolean
   includeMetadata?: boolean
   queryKey?: unknown[]
-  errorFallback?: JSX.Element
-  loadingFallback?: JSX.Element
   href?: string
   class?: string
   children?: JSX.Element
@@ -26,8 +24,6 @@ const ProductRoot = (props: ProductRootProps) => {
     "includeMedia",
     "includeMetadata",
     "queryKey",
-    "errorFallback",
-    "loadingFallback",
     "href",
     "class",
     "children",
@@ -78,8 +74,6 @@ const ProductRoot = (props: ProductRootProps) => {
             includeMedia={local.includeMedia}
             includeMetadata={local.includeMetadata}
             queryKey={local.queryKey}
-            errorFallback={local.errorFallback}
-            loadingFallback={local.loadingFallback}
             href={local.href}
             class={local.class}
           >
@@ -139,8 +133,6 @@ const ProductRootWithFetch = (props: Omit<ProductRootProps, "data">) => {
     "includeMedia",
     "includeMetadata",
     "queryKey",
-    "errorFallback",
-    "loadingFallback",
     "href",
     "class",
     "children",
@@ -180,19 +172,12 @@ const ProductRootWithFetch = (props: Omit<ProductRootProps, "data">) => {
           ]
         }
       >
-        <QueryBoundary
-          loadingFallback={
-            local.loadingFallback ?? <DefaultProductLoading />
-          }
-          errorFallback={local.errorFallback}
+        <ProductRootContent
+          href={local.href}
+          class={local.class}
         >
-          <ProductRootContent
-            href={local.href}
-            class={local.class}
-          >
-            {local.children}
-          </ProductRootContent>
-        </QueryBoundary>
+          {local.children}
+        </ProductRootContent>
       </Query>
     </Show>
   )

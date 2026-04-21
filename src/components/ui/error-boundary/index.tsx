@@ -24,7 +24,6 @@ import {
 } from "solid-js";
 import { Show, ErrorBoundary as SolidErrorBoundary } from "solid-js";
 import { Button, type ButtonProps } from "./../button"
-import ErrorBoundaryWrapper from "./error-boundary-wrapper";
 // ErrorBoundary Context
 // ============================================================================
 
@@ -53,23 +52,20 @@ type ErrorBoundaryProps = {
   children: JSX.Element;
 };
 
-/*FIXME: Currently having issue with ssr; infinite loading, temporariry wrapped with client only wrapper to avoid ssr */
 const ErrorBoundary = (props: ErrorBoundaryProps) => {
   return (
-    <ErrorBoundaryWrapper>
-      <SolidErrorBoundary
-        fallback={(error, reset) => {
-          console.error(error)
-          return (
-            <ErrorBoundaryContext.Provider value={{ error, reset }}>
-              {props.fallback}
-            </ErrorBoundaryContext.Provider>
-          )
-        }}
-      >
-        {props.children}
-      </SolidErrorBoundary>
-    </ErrorBoundaryWrapper>
+    <SolidErrorBoundary
+      fallback={(error, reset) => {
+        console.error(error)
+        return (
+          <ErrorBoundaryContext.Provider value={{ error, reset }}>
+            {props.fallback}
+          </ErrorBoundaryContext.Provider>
+        )
+      }}
+    >
+      {props.children}
+    </SolidErrorBoundary>
   );
 };
 

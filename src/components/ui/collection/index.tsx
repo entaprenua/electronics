@@ -18,7 +18,7 @@
  *   6. useCollectionItem() accesses current item in child components
  */
 
-import { Query, QueryBoundary, useQueryState } from "./../query"
+import { Query, useQueryState } from "./../query"
 import {
   splitProps, Switch, children, createContext, useContext, For, Match, Show, createMemo,
   type JSX, type Accessor,
@@ -106,8 +106,6 @@ const CollectionItem = (props: CollectionItemProps) => {
 
 type CollectionProps = {
   children?: JSX.Element
-  errorFallback?: JSX.Element
-  loadingFallback?: JSX.Element
   /** Function to fetch data remotely */
   queryFn?: () => Promise<any>
   /** Direct data array (alternative to queryFn) */
@@ -119,8 +117,6 @@ type CollectionProps = {
 const Collection = (props: CollectionProps) => {
   const [local] = splitProps(props, [
     "children",
-    "errorFallback",
-    "loadingFallback",
     "queryFn",
     "data",
     "queryKey",
@@ -138,19 +134,14 @@ const Collection = (props: CollectionProps) => {
         queryKey={local.queryKey ?? ["collection"]}
         enabled={local.enabled ?? true}
       >
-        <QueryBoundary
-          loadingFallback={local.loadingFallback}
-          errorFallback={local.errorFallback}
+        <CollectionInner
+          data={() => {
+            const query = useQueryState()
+            return (query?.data as any[]) ?? []
+          }}
         >
-          <CollectionInner
-            data={() => {
-              const query = useQueryState()
-              return (query?.data as any[]) ?? []
-            }}
-          >
-            {local.children}
-          </CollectionInner>
-        </QueryBoundary>
+          {local.children}
+        </CollectionInner>
       </Query>
     )
   }

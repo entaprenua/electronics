@@ -4,21 +4,17 @@ import { MetaProvider } from "@solidjs/meta";
 import { AuthProvider } from "~/lib/guards/auth";
 import { StoreProvider } from "~/components/ui/store";
 import { ColorMode } from "~/components/ui/color-mode"
-import { CartProvider } from "~/components/ui/cart"
-import { OrderProvider } from "~/components/ui/order"
 import { ErrorBoundary, ErrorBoundaryMessage, ErrorBoundaryResetButton } from "~/components/ui/error-boundary"
 import { Flex } from "~/components/ui/flex"
 import { Text } from "~/components/ui/text"
-import { QueryClient } from "~/components/ui/query-client"
 import AlertTriangleIcon from "lucide-solid/icons/alert-triangle"
 import "./app.css";
 import RootLayout from "./root-layout"
+import { QueryClient, useQueryClient } from "~/components/ui/query-client"
+import { OrderProvider } from "~/components/ui/order"
 
-/* FIXME: currently, ErrorBoundary in ssr mode is loading infinetly so we  wrapped it in client-only,
-* thus ssr is disabled. Solution is under way
-* */
+
 export default function App() {
-
   return (
     <MetaProvider>
       <ColorMode>
@@ -44,13 +40,11 @@ export default function App() {
             <StoreProvider publicId="st_1abc00000200">
               <AuthProvider>
                 <OrderProvider>
-                  <CartProvider>
-                    <Router
-                      root={RootLayout}
-                    >
-                      <FileRoutes />
-                    </Router>
-                  </CartProvider>
+                  <Router
+                    root={RootLayout}
+                  >
+                    <FileRoutes />
+                  </Router>
                 </OrderProvider>
               </AuthProvider>
             </StoreProvider>

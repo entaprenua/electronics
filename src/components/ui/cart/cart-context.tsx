@@ -120,8 +120,10 @@ export const CartProvider = (props: CartProviderProps) => {
   }))
 
   createEffect(() => {
-    if (cartQuery.data) {
-      setCart(cartQuery.data)
+    if (!cartQuery.isError && !cartQuery.isLoading) {
+      if (cartQuery.data) {
+        setCart(cartQuery.data)
+      }
     }
   })
 
@@ -157,19 +159,19 @@ export const CartProvider = (props: CartProviderProps) => {
   const ensureCart = async (): Promise<Cart | null> => {
     let current = currentCart()
     const publicId = getPublicId()
-    
+
     if (!current && publicId) {
       if (!auth.user()) {
         await ensureGuestSession(publicId)
       }
-      
+
       try {
         current = await cartsApi.create(publicId)
       } catch {
         current = await cartsApi.get(publicId)
       }
     }
-    
+
     return current
   }
 
@@ -199,23 +201,23 @@ export const CartProvider = (props: CartProviderProps) => {
 
       const optimisticItems = existingItem
         ? items().map(item =>
-            item.productId === input.productId
-              ? { ...item, quantity: item.quantity + quantity, subtotal: item.price * (item.quantity + quantity) }
-              : item
-          )
+          item.productId === input.productId
+            ? { ...item, quantity: item.quantity + quantity, subtotal: item.price * (item.quantity + quantity) }
+            : item
+        )
         : [
-            ...items(),
-            {
-              id: crypto.randomUUID?.() ?? `temp-${Date.now()}`,
-              productId: input.productId,
-              quantity,
-              price: input.price,
-              name: input.name ?? "",
-              image: input.image,
-              selected: true,
-              subtotal: input.price * quantity,
-            }
-          ]
+          ...items(),
+          {
+            id: crypto.randomUUID?.() ?? `temp-${Date.now()}`,
+            productId: input.productId,
+            quantity,
+            price: input.price,
+            name: input.name ?? "",
+            image: input.image,
+            selected: true,
+            subtotal: input.price * quantity,
+          }
+        ]
 
       setOptimisticCart(createOptimisticCart({ items: optimisticItems as CartItem[] }))
       return { items: items() }
@@ -368,11 +370,11 @@ export const CartProvider = (props: CartProviderProps) => {
       const publicId = getPublicId()
       const cid = cartId()
       if (!publicId || !cid) throw new Error("Missing cart info")
-      
+
       // Get the NEW selected value (after optimistic update already happened)
       const item = items().find(i => i.productId === productId)
       if (!item) throw new Error("Item not found")
-      
+
       await cartsApi.updateItem(publicId, cid, productId, {
         selected: item.selected,
       })
@@ -390,17 +392,17 @@ export const CartProvider = (props: CartProviderProps) => {
     // Immediate optimistic update (like before)
     const current = currentCart()
     if (!current?.items) return
-    
+
     const item = items().find(i => i.productId === productId)
     if (!item) return
-    
+
     setOptimisticCart({
       ...current,
       items: current.items.map(i =>
         i.productId === productId ? { ...i, selected: !item.selected } : i
       ),
     })
-    
+
     // Background server sync
     toggleSelectedMutation.mutate(productId)
   }
@@ -410,7 +412,7 @@ export const CartProvider = (props: CartProviderProps) => {
       const publicId = getPublicId()
       const cid = cartId()
       if (!publicId || !cid) throw new Error("Missing cart info")
-      
+
       for (const item of items()) {
         if (!item.selected) {
           await cartsApi.updateItem(publicId, cid, item.productId, { selected: true })
@@ -442,7 +444,7 @@ export const CartProvider = (props: CartProviderProps) => {
       const publicId = getPublicId()
       const cid = cartId()
       if (!publicId || !cid) throw new Error("Missing cart info")
-      
+
       for (const item of items()) {
         if (item.selected) {
           await cartsApi.updateItem(publicId, cid, item.productId, { selected: false })

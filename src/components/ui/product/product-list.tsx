@@ -17,8 +17,6 @@ type ProductListProps = {
   pageSize?: number
   queryKey?: unknown[]
   enabled?: boolean
-  errorFallback?: JSX.Element
-  loadingFallback?: JSX.Element
   children?: JSX.Element
 }
 
@@ -31,8 +29,6 @@ const ProductListInner = (props: ProductListProps) => {
     "pageSize",
     "queryKey",
     "enabled",
-    "errorFallback",
-    "loadingFallback",
     "children",
   ])
   const category = useCategoryOptional()
@@ -81,8 +77,6 @@ const ProductListInner = (props: ProductListProps) => {
       queryFn={queryFn}
       queryKey={local.queryKey ?? key}
       enabled={local.enabled ?? true}
-      loadingFallback={local.loadingFallback ?? <DefaultProductListLoading />}
-      errorFallback={local.errorFallback}
     >
       {local.children}
     </Collection>
@@ -97,19 +91,6 @@ const ProductList = (props: ProductListProps) => {
   )
 }
 
-const DefaultProductListLoading = () => (
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-    <For each={[1, 2, 3, 4, 5, 6, 7, 8]}>
-      {() => (
-        <div class="animate-pulse space-y-3 p-4 border rounded-lg">
-          <div class="h-48 bg-muted rounded-md" />
-          <div class="h-4 bg-muted rounded w-3/4" />
-          <div class="h-4 bg-muted rounded w-1/2" />
-        </div>
-      )}
-    </For>
-  </div>
-)
 
 type ProductListViewProps = {
   class?: string

@@ -1,4 +1,4 @@
-import { QueryClient as TanStackQueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { useQueryClient, QueryClient as TanStackQueryClient, QueryClientProvider } from "@tanstack/solid-query";
 const queryClient = new TanStackQueryClient()
 import { splitProps } from "solid-js";
 
@@ -13,4 +13,4 @@ const QueryClient = (props) => {
 
 }
 
-export { QueryClient }
+export { QueryClient, useQueryClient }

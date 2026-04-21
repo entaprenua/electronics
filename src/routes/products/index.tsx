@@ -5,33 +5,25 @@ import { Grid } from "~/components/ui/grid"
 import { Flex } from "~/components/ui/flex"
 import { Text } from "~/components/ui/text"
 
-function SectionTitle(props: { title: string }) {
-  return (
-    <Text variant="h1" class="text-3xl font-bold mb-8">
-      {props.title}
-    </Text>
-  )
-}
-
 function ProductCard() {
   return (
-    <Product href="/products" class="group bg-white rounded-lg border m-1 overflow-hidden hover:shadow-lg transition-all duration-200">
-      <div class="relative overflow-hidden">
-        <ProductImage class="w-full aspect-square object-cover transition-transform duration-300 group-hover:scale-105" />
-        <div class="absolute top-2 right-2">
-          <ProductToggleWishlistTrigger class="p-2 bg-white/90 rounded-full hover:bg-white" />
+    <Product href="/products" class="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200">
+      <div class="relative overflow-hidden bg-slate-100">
+        <ProductImage class="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <ProductToggleWishlistTrigger class="p-2 bg-white rounded-full shadow-md hover:text-cyan-600" />
         </div>
-        <div class="absolute bottom-2 left-2">
-          <ProductStockBadge class="text-xs" />
+        <div class="absolute bottom-3 left-3">
+          <ProductStockBadge class="text-xs bg-cyan-500 text-white" />
         </div>
       </div>
       <div class="p-4">
-        <ProductName class="font-medium line-clamp-2 min-h-[2.5rem]" />
-        <div class="flex items-baseline gap-2 mt-2">
-          <ProductPrice class="text-lg font-bold text-primary" />
+        <ProductName class="font-medium text-slate-800 line-clamp-2 min-h-[2.5rem]" />
+        <div class="flex items-baseline gap-2 mt-3">
+          <ProductPrice class="text-lg font-bold text-cyan-600" />
         </div>
         <div class="mt-4">
-          <ProductAddToCartTrigger class="w-full" />
+          <ProductAddToCartTrigger class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded" />
         </div>
       </div>
     </Product>
@@ -40,7 +32,7 @@ function ProductCard() {
 
 function SearchSection() {
   return (
-    <div class="mb-8">
+    <div class="mb-10">
       <ProductSearch
         class="w-full md:w-96"
         itemComponent={
@@ -58,12 +50,12 @@ function SearchSection() {
         }
       >
         <SearchControl>
-          <SearchInput placeholder="Search products..." />
+          <SearchInput placeholder="Search electronics..." />
         </SearchControl>
         <SearchContent>
           <SearchListbox />
           <SearchNoResult class="px-4 py-2 text-sm text-muted-foreground">
-            No products found
+            No electronics found
           </SearchNoResult>
         </SearchContent>
       </ProductSearch>
@@ -71,27 +63,28 @@ function SearchSection() {
   )
 }
 
-function ProductsSection() {
-  return (
-    <ProductList>
-      <ProductListEmptyView />
-      <ProductListContent>
-        <Grid cols={2} colsSm={2} colsMd={3} colsLg={4}>
-          <ProductListView>
-            <ProductCard />
-          </ProductListView>
-        </Grid>
-      </ProductListContent>
-    </ProductList>
-  )
-}
-
 export default function ProductsPage() {
   return (
-    <div class="container mx-auto px-4 py-8">
-      <SectionTitle title="All Products" />
-      <SearchSection />
-      <ProductsSection />
+    <div class="bg-slate-50 min-h-screen">
+      <div class="container mx-auto px-4 py-12">
+        <Flex class="flex-col items-center mb-10">
+          <Text variant="h1" class="text-3xl font-bold">Our Collection</Text>
+          <Text class="text-slate-500 mt-2">Latest tech and gadgets</Text>
+        </Flex>
+        
+        <SearchSection />
+        
+        <ProductList>
+          <ProductListEmptyView />
+          <ProductListContent>
+            <Grid cols={2} colsSm={2} colsMd={3} colsLg={4}>
+              <ProductListView>
+                <ProductCard />
+              </ProductListView>
+            </Grid>
+          </ProductListContent>
+        </ProductList>
+      </div>
     </div>
   )
 }
