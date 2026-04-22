@@ -43,7 +43,7 @@ function CategorySection() {
       <div class="container mx-auto px-4">
         <Text variant="h2" class="text-2xl font-bold text-center mb-2">Shop by Category</Text>
         <Text class="text-slate-500 text-center mb-10">Find the perfect device for your needs</Text>
-        
+
         <CategoryList mode="root">
           <CategoryListEmptyView />
           <Grid cols={2} colsSm={2} colsMd={4} colsLg={4}>
@@ -67,7 +67,7 @@ function CategorySection() {
 
 function ProductCard() {
   return (
-    <Product class="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200">
+    <Product href="/products" class="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200">
       <div class="relative overflow-hidden bg-slate-100">
         <ProductImage class="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-105" />
         <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -98,7 +98,7 @@ function FeaturedSection() {
           <Text variant="h2" class="text-2xl font-bold">New Arrivals</Text>
           <Text class="text-slate-500 mt-2">Latest tech drops</Text>
         </Flex>
-        
+
         <RecommendationsRoot type="newest" limit={8}>
           <RecommendationsItems>
             <RecommendationsContent>
@@ -123,7 +123,7 @@ function BestsellersSection() {
           <Text variant="h2" class="text-2xl font-bold">Best Sellers</Text>
           <Text class="text-slate-500 mt-2">Most popular picks</Text>
         </Flex>
-        
+
         <RecommendationsRoot type="popular" limit={8}>
           <RecommendationsItems>
             <RecommendationsContent>
