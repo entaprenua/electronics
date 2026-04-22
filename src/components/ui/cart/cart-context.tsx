@@ -1,4 +1,4 @@
-import { createContext, useContext, type JSX, type Accessor, createMemo, createSignal, Show, createEffect } from "solid-js"
+import { createContext, Suspense, useContext, type JSX, type Accessor, createMemo, createSignal, Show, createEffect } from "solid-js"
 import { createQuery, createMutation, useQueryClient } from "@tanstack/solid-query"
 import { cartsApi, type Cart, type CartItem } from "~/lib/api/carts"
 import { sessionsApi } from "~/lib/api/sessions"
@@ -524,23 +524,13 @@ export const CartProvider = (props: CartProviderProps) => {
 
   return (
     <CartContext.Provider value={value}>
-      <Show
-        when={!cartQuery.isLoading}
-        fallback={props.loadingFallback ?? <DefaultCartLoading />}
-      >
+      <Suspense>
         {props.children}
-      </Show>
+      </Suspense>
     </CartContext.Provider>
   )
 }
 
-const DefaultCartLoading = () => (
-  <div class="animate-pulse space-y-4 p-4">
-    <div class="h-20 bg-muted rounded" />
-    <div class="h-20 bg-muted rounded" />
-    <div class="h-20 bg-muted rounded" />
-  </div>
-)
 
 export { CartContext }
 export type { CartContextValue, CartProviderProps }
